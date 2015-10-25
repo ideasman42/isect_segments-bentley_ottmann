@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Tiny//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-tiny.dtd">
+<svg version="1.1" width="1126" height="1126" viewBox="-563 -563 1126 1126" xmlns="http://www.w3.org/2000/svg">
+<rect x="-563" y="-563" width="1126" height="1126" fill="black"/>
+<g stroke="white" stroke-opacity="0.25" stroke-width="1">
+<line x1="-512.0000" y1="-512.0000" x2="512.0000" y2="512.0000" />
+<line x1="512.0000" y1="512.0000" x2="-512.0000" y2="512.0000" />
+<line x1="-512.0000" y1="512.0000" x2="512.0000" y2="-512.0000" />
+<line x1="512.0000" y1="-512.0000" x2="-512.0000" y2="-512.0000" />
+</g>
+<g fill="yellow" fill-opacity="0.25" stroke="white" stroke-opacity="0.5" stroke-width="1">
+<circle cx="-0.0000" cy="0.0000" r="2"/>
+</g>
+</svg>
