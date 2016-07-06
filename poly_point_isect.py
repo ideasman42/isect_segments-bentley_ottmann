@@ -607,7 +607,7 @@ def isect_segments__naive(segments) -> list:
 
 def isect_polygon__naive(points) -> list:
     """
-    Brute force O(n2) version of ``isect_segments`` for test validation.
+    Brute force O(n2) version of ``isect_polygon`` for test validation.
     """
     isect = []
 
