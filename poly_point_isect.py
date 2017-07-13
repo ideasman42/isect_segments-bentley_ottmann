@@ -193,7 +193,19 @@ class SweepLine:
         self._before = True
 
     def get_intersections(self):
+        """
+        Return a list of unordered intersection points.
+        """
         return list(self.intersections.keys())
+
+    # Not essential for implementing this algorithm, but useful.
+    def get_intersections_with_segments(self):
+        """
+        Return a list of unordered intersection '(point, segment)' pairs,
+        where segments may contain 2 or more values.
+        """
+        return [(p, [event.segment for event in event_set])
+                for p, event_set in self.intersections.items()]
 
     # Checks if an intersection exists between two Events 'a' and 'b'.
     def _check_intersection(self, a: Event, b: Event):
