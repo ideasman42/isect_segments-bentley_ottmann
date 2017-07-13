@@ -118,18 +118,18 @@ class Event:
             if this.other is that:
                 return 0
         current_point_x = sweep_line._current_event_point_x
-        ipthis = this.y_intercept_x(current_point_x)
-        ipthat = that.y_intercept_x(current_point_x)
-        # print(ipthis, ipthat)
+        this_y = this.y_intercept_x(current_point_x)
+        that_y = that.y_intercept_x(current_point_x)
+        # print(this_y, that_y)
         if USE_VERTICAL:
-            if ipthis is None:
-                ipthis = this.point[Y]
-            if ipthat is None:
-                ipthat = that.point[Y]
+            if this_y is None:
+                this_y = this.point[Y]
+            if that_y is None:
+                that_y = that.point[Y]
 
-        delta_y = ipthis - ipthat
+        delta_y = this_y - that_y
 
-        assert((delta_y < 0.0) == (ipthis < ipthat))
+        assert((delta_y < 0.0) == (this_y < that_y))
         # NOTE, VERY IMPORTANT TO USE EPSILON HERE!
         # otherwise w/ float precision errors we get incorrect comparisons
         # can get very strange & hard to debug output without this.
