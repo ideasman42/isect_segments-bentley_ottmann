@@ -74,6 +74,11 @@ Example:
    # [(0.5, 0.5)]
 
 
+There are also: ``isect_polygon_include_segments(points)`` and ``isect_segments_include_segments(segments)``,
+versions of the functions described above which return a tuple for each intersection: ``(point, list_of_segments)``
+so you can find which segments belong to an intersection.
+
+
 Details
 =======
 

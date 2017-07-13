@@ -6,6 +6,10 @@ __all__ = (
     "isect_segments",
     "isect_polygon",
 
+    # same as above but includes segments with each intersections
+    "isect_segments_include_segments",
+    "isect_polygon_include_segments",
+
     # for testing only (correct but slow)
     "isect_segments__naive",
     "isect_polygon__naive",
@@ -483,7 +487,7 @@ class EventQueue:
         return p, events_current
 
 
-def isect_segments(segments) -> list:
+def isect_segments_impl(segments, include_segments=False) -> list:
     # order points left -> right
     segments = [
         # in nearly all cases, comparing X is enough,
@@ -504,15 +508,34 @@ def isect_segments(segments) -> list:
                 sweep_line._sweep_to(p)
                 sweep_line.handle(p, events_current)
 
-    return sweep_line.get_intersections()
+    if include_segments is False:
+        return sweep_line.get_intersections()
+    else:
+        return sweep_line.get_intersections_with_segments()
 
 
-def isect_polygon(points) -> list:
+def isect_polygon_impl(points, include_segments=False) -> list:
     n = len(points)
     segments = [
         (tuple(points[i]), tuple(points[(i + 1) % n]))
         for i in range(n)]
-    return isect_segments(segments)
+    return isect_segments_impl(segments, include_segments=include_segments)
+
+
+def isect_segments(segments) -> list:
+    return isect_segments_impl(segments, include_segments=False)
+
+
+def isect_polygon(segments) -> list:
+    return isect_polygon_impl(segments, include_segments=False)
+
+
+def isect_segments_include_segments(segments) -> list:
+    return isect_segments_impl(segments, include_segments=True)
+
+
+def isect_polygon_include_segments(segments) -> list:
+    return isect_polygon_impl(segments, include_segments=True)
 
 
 # ----------------------------------------------------------------------------
