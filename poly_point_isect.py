@@ -137,7 +137,14 @@ class Event:
         # NOTE, VERY IMPORTANT TO USE EPSILON HERE!
         # otherwise w/ float precision errors we get incorrect comparisons
         # can get very strange & hard to debug output without this.
-        if abs(delta_y) > EPS:
+
+        # TODO, investigate exactly how the epsilon should be scaled,
+        # this works but its only a test.
+        #
+        # Logic is, the bigger the number, the more we should consider minor differences important.
+        EPS_SCALE = EPS / (1.0 + (abs(this_y) + abs(that_y)))
+
+        if abs(delta_y) >= EPS_SCALE:
             return -1 if (delta_y < 0.0) else 1
         else:
             this_slope = this.slope

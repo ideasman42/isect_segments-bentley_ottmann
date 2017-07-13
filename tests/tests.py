@@ -227,6 +227,9 @@ class IsectTest(unittest.TestCase, TestDataFile_Helper):
     def test_spiro(self):
         self.assertTestData("test_isect_spiro_01")
 
+    def test_issue_4(self):
+        self.assertTestData("test_isect_issue_4")
+
 
 if __name__ == '__main__':
     unittest.main()
