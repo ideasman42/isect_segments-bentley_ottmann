@@ -83,7 +83,8 @@ class Event:
             self.in_sweep = False
 
     def is_vertical(self):
-        return self.segment[0][X] == self.segment[1][X]
+        # return self.segment[0][X] == self.segment[1][X]
+        return self.span == 0.0
 
     def y_intercept_x(self, x: float):
         # vertical events only for comparison (above_all check)
