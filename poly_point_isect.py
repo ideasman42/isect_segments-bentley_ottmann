@@ -350,7 +350,7 @@ class SweepLine:
             # note: events_current aren't sorted.
             reinsert_stack = []  # Stack
             for e in event_set:
-                # If we the Event was not already removed,
+                # Since we know the Event wasn't already removed,
                 # we want to insert it later on.
                 if self.remove(e):
                     reinsert_stack.append(e)
