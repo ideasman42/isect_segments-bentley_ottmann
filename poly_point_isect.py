@@ -43,9 +43,43 @@ USE_VERTICAL = True
 # ---------
 # Constants
 X, Y = 0, 1
-EPS = 1e-10
-EPS_SQ = EPS * EPS
-INF = float("inf")
+
+# -----------------------------------------------------------------------------
+# Switchable Number Implementation
+
+NUMBER_TYPE = 'native'
+
+if NUMBER_TYPE == 'native':
+    Real = float
+    NUM_EPS = Real("1e-10")
+    NUM_INF = Real(float("inf"))
+elif NUMBER_TYPE == 'decimal':
+    # Not passing tests!
+    import decimal
+    Real = decimal.Decimal
+    decimal.getcontext().prec = 80
+    NUM_EPS = Real("1e-10")
+    NUM_INF = Real(float("inf"))
+elif NUMBER_TYPE == 'numpy':
+    import numpy
+    Real = numpy.float64
+    del numpy
+    NUM_EPS = Real("1e-10")
+    NUM_INF = Real(float("inf"))
+elif NUMBER_TYPE == 'gmpy2':
+    # Not passing tests!
+    import gmpy2
+    gmpy2.set_context(gmpy2.ieee(128))
+    Real = gmpy2.mpz
+    NUM_EPS = Real(float("1e-10"))
+    NUM_INF = gmpy2.get_emax_max()
+    del gmpy2
+else:
+    raise Exception("Type not found")
+
+NUM_EPS_SQ = NUM_EPS * NUM_EPS
+NUM_ZERO = Real(0.0)
+NUM_ONE = Real(1.0)
 
 
 class Event:
@@ -88,9 +122,9 @@ class Event:
 
     def is_vertical(self):
         # return self.segment[0][X] == self.segment[1][X]
-        return self.span == 0.0
+        return self.span == NUM_ZERO
 
-    def y_intercept_x(self, x: float):
+    def y_intercept_x(self, x: Real):
         # vertical events only for comparison (above_all check)
         # never added into the binary-tree its self
         if USE_VERTICAL:
@@ -107,11 +141,11 @@ class Event:
         delta_x1 = self.segment[1][X] - x
         if delta_x0 > delta_x1:
             ifac = delta_x0 / self.span
-            fac = 1.0 - ifac
+            fac = NUM_ONE - ifac
         else:
             fac = delta_x1 / self.span
-            ifac = 1.0 - fac
-        assert(fac <= 1.0)
+            ifac = NUM_ONE - fac
+        assert(fac <= NUM_ONE)
         return (self.segment[0][Y] * fac) + (self.segment[1][Y] * ifac)
 
     @staticmethod
@@ -133,12 +167,12 @@ class Event:
 
         delta_y = this_y - that_y
 
-        assert((delta_y < 0.0) == (this_y < that_y))
+        assert((delta_y < NUM_ZERO) == (this_y < that_y))
         # NOTE, VERY IMPORTANT TO USE EPSILON HERE!
         # otherwise w/ float precision errors we get incorrect comparisons
         # can get very strange & hard to debug output without this.
-        if abs(delta_y) > EPS:
-            return -1 if (delta_y < 0.0) else 1
+        if abs(delta_y) > NUM_EPS:
+            return -1 if (delta_y < NUM_ZERO) else 1
         else:
             this_slope = this.slope
             that_slope = that.slope
@@ -149,12 +183,12 @@ class Event:
                     return 1 if (this_slope > that_slope) else -1
 
         delta_x_p1 = this.segment[0][X] - that.segment[0][X]
-        if delta_x_p1 != 0.0:
-            return -1 if (delta_x_p1 < 0.0) else 1
+        if delta_x_p1 != NUM_ZERO:
+            return -1 if (delta_x_p1 < NUM_ZERO) else 1
 
         delta_x_p2 = this.segment[1][X] - that.segment[1][X]
-        if delta_x_p2 != 0.0:
-            return -1 if (delta_x_p2 < 0.0) else 1
+        if delta_x_p2 != NUM_ZERO:
+            return -1 if (delta_x_p2 < NUM_ZERO) else 1
 
         return 0
 
@@ -200,7 +234,10 @@ class SweepLine:
         """
         Return a list of unordered intersection points.
         """
-        return list(self.intersections.keys())
+        if Real is float:
+            return list(self.intersections.keys())
+        else:
+            return [(float(p[0]), float(p[1])) for p in self.intersections.keys()]
 
     # Not essential for implementing this algorithm, but useful.
     def get_intersections_with_segments(self):
@@ -208,8 +245,21 @@ class SweepLine:
         Return a list of unordered intersection '(point, segment)' pairs,
         where segments may contain 2 or more values.
         """
-        return [(p, [event.segment for event in event_set])
-                for p, event_set in self.intersections.items()]
+        if Real is float:
+            return [
+                (p, [event.segment for event in event_set])
+                for p, event_set in self.intersections.items()
+            ]
+        else:
+            return [
+                (
+                    (float(p[0]), float(p[1])),
+                    [((float(event.segment[0][0]), float(event.segment[0][1])),
+                      (float(event.segment[1][0]), float(event.segment[1][1])))
+                     for event in event_set],
+                )
+                for p, event_set in self.intersections.items()
+            ]
 
     # Checks if an intersection exists between two Events 'a' and 'b'.
     def _check_intersection(self, a: Event, b: Event):
@@ -237,10 +287,10 @@ class SweepLine:
         # USE_IGNORE_SEGMENT_ENDINGS is true,
         # return from this method.
         if USE_IGNORE_SEGMENT_ENDINGS:
-            if ((len_squared_v2v2(p, a.segment[0]) < EPS_SQ or
-                 len_squared_v2v2(p, a.segment[1]) < EPS_SQ) and
-                (len_squared_v2v2(p, b.segment[0]) < EPS_SQ or
-                 len_squared_v2v2(p, b.segment[1]) < EPS_SQ)):
+            if ((len_squared_v2v2(p, a.segment[0]) < NUM_EPS_SQ or
+                 len_squared_v2v2(p, a.segment[1]) < NUM_EPS_SQ) and
+                (len_squared_v2v2(p, b.segment[0]) < NUM_EPS_SQ or
+                 len_squared_v2v2(p, b.segment[1]) < NUM_EPS_SQ)):
 
                 return
 
@@ -489,12 +539,26 @@ class EventQueue:
 
 def isect_segments_impl(segments, include_segments=False) -> list:
     # order points left -> right
-    segments = [
-        # in nearly all cases, comparing X is enough,
-        # but compare Y too for vertical lines
-        (s[0], s[1]) if (s[0] <= s[1]) else
-        (s[1], s[0])
-        for s in segments]
+    if Real is float:
+        segments = [
+            # in nearly all cases, comparing X is enough,
+            # but compare Y too for vertical lines
+            (s[0], s[1]) if (s[0] <= s[1]) else
+            (s[1], s[0])
+            for s in segments]
+    else:
+        segments = [
+            # in nearly all cases, comparing X is enough,
+            # but compare Y too for vertical lines
+            (
+                (Real(s[0][0]), Real(s[0][1])),
+                (Real(s[1][0]), Real(s[1][1])),
+            ) if (s[0] <= s[1]) else
+            (
+                (Real(s[1][0]), Real(s[1][1])),
+                (Real(s[0][0]), Real(s[0][1])),
+            )
+            for s in segments]
 
     sweep_line = SweepLine()
     queue = EventQueue(segments, sweep_line)
@@ -545,9 +609,9 @@ def isect_polygon_include_segments(segments) -> list:
 def slope_v2v2(p1, p2):
     if p1[X] == p2[X]:
         if p1[Y] < p2[Y]:
-            return INF
+            return NUM_INF
         else:
-            return -INF
+            return -NUM_INF
     else:
         return (p2[Y] - p1[Y]) / (p2[X] - p1[X])
 
@@ -569,14 +633,14 @@ def len_squared_v2v2(a, b):
     return dot_v2v2(c, c)
 
 
-def line_point_factor_v2(p, l1, l2, default=0.0):
+def line_point_factor_v2(p, l1, l2, default=NUM_ZERO):
     u = sub_v2v2(l2, l1)
     h = sub_v2v2(p, l1)
     dot = dot_v2v2(u, u)
-    return (dot_v2v2(u, h) / dot) if dot != 0.0 else default
+    return (dot_v2v2(u, h) / dot) if dot != NUM_ZERO else default
 
 
-def isect_seg_seg_v2_point(v1, v2, v3, v4, bias=0.0):
+def isect_seg_seg_v2_point(v1, v2, v3, v4, bias=NUM_ZERO):
     # Only for predictability and hashable point when same input is given
     if v1 > v2:
         v1, v2 = v2, v1
@@ -587,7 +651,7 @@ def isect_seg_seg_v2_point(v1, v2, v3, v4, bias=0.0):
         v1, v2, v3, v4 = v3, v4, v1, v2
 
     div = (v2[0] - v1[0]) * (v4[1] - v3[1]) - (v2[1] - v1[1]) * (v4[0] - v3[0])
-    if div == 0.0:
+    if div == NUM_ZERO:
         return None
 
     vi = (((v3[0] - v4[0]) *
@@ -598,12 +662,12 @@ def isect_seg_seg_v2_point(v1, v2, v3, v4, bias=0.0):
            (v3[0] * v4[1] - v3[1] * v4[0])) / div,
           )
 
-    fac = line_point_factor_v2(vi, v1, v2, default=-1.0)
-    if fac < 0.0 - bias or fac > 1.0 + bias:
+    fac = line_point_factor_v2(vi, v1, v2, default=-NUM_ONE)
+    if fac < NUM_ZERO - bias or fac > NUM_ONE + bias:
         return None
 
-    fac = line_point_factor_v2(vi, v3, v4, default=-1.0)
-    if fac < 0.0 - bias or fac > 1.0 + bias:
+    fac = line_point_factor_v2(vi, v3, v4, default=-NUM_ONE)
+    if fac < NUM_ZERO - bias or fac > NUM_ONE + bias:
         return None
 
     # vi = round(vi[X], 8), round(vi[Y], 8)
@@ -621,10 +685,22 @@ def isect_segments__naive(segments) -> list:
     isect = []
 
     # order points left -> right
-    segments = [
-        (s[0], s[1]) if s[0][X] <= s[1][X] else
-        (s[1], s[0])
-        for s in segments]
+    if Real is float:
+        segments = [
+            (s[0], s[1]) if s[0][X] <= s[1][X] else
+            (s[1], s[0])
+            for s in segments]
+    else:
+        segments = [
+            (
+                (Real(s[0][0]), Real(s[0][1])),
+                (Real(s[1][0]), Real(s[1][1])),
+            ) if (s[0] <= s[1]) else
+            (
+                (Real(s[1][0]), Real(s[1][1])),
+                (Real(s[0][0]), Real(s[0][1])),
+            )
+            for s in segments]
 
     n = len(segments)
 
@@ -649,6 +725,12 @@ def isect_polygon__naive(points) -> list:
 
     n = len(points)
 
+    if Real is float:
+        pass
+    else:
+        points = [(Real(p[0]), Real(p[1])) for p in points]
+
+
     for i in range(n):
         a0, a1 = points[i], points[(i + 1) % n]
         for j in range(i + 1, n):
@@ -658,10 +740,10 @@ def isect_polygon__naive(points) -> list:
                 if ix is not None:
 
                     if USE_IGNORE_SEGMENT_ENDINGS:
-                        if ((len_squared_v2v2(ix, a0) < EPS_SQ or
-                             len_squared_v2v2(ix, a1) < EPS_SQ) and
-                            (len_squared_v2v2(ix, b0) < EPS_SQ or
-                             len_squared_v2v2(ix, b1) < EPS_SQ)):
+                        if ((len_squared_v2v2(ix, a0) < NUM_EPS_SQ or
+                             len_squared_v2v2(ix, a1) < NUM_EPS_SQ) and
+                            (len_squared_v2v2(ix, b0) < NUM_EPS_SQ or
+                             len_squared_v2v2(ix, b1) < NUM_EPS_SQ)):
                             continue
 
                     isect.append(ix)

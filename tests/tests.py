@@ -103,7 +103,7 @@ def isect_segments_compare(s):
             angle_deg = 44.999995 + fac
             if angle_deg not in {44.9999955, 45}:
                 continue
-            print(angle_deg)
+            # print(angle_deg)
             # angle_deg = (360 / ROTATION_DIV) * i
             angle_rad = radians(angle_deg)
             s_rotate = segments_rotate(s, angle_rad)
