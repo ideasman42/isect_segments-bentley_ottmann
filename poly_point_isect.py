@@ -452,7 +452,7 @@ class SweepLine:
                 y_above = e_above.y_intercept_x(
                         self._current_event_point_x)
                 if USE_IGNORE_SEGMENT_ENDINGS:
-                    if y_above >= y_above_max:
+                    if y_above >= y_above_max - NUM_EPS:
                         break
                 else:
                     if y_above > y_above_max:
