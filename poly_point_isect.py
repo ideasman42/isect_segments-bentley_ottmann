@@ -120,6 +120,9 @@ class Event:
             self.other = None
             self.in_sweep = False
 
+    def __hash__(self):
+        return hash(self.point)
+
     def is_vertical(self):
         # return self.segment[0][X] == self.segment[1][X]
         return self.span == NUM_ZERO
