@@ -32,8 +32,8 @@ Existing Implementations
 
   Not Bentley-Ottmann strictly speaking, but the method is very similar.
 - The `geomalgorithms.com <http://geomalgorithms.com/a09-_intersect-3.html>`__,
-  while a great introduction, is referenced as the main,
-  but in fact only detects weather the polygon is self-intersecting or not.
+  while a great introduction, and frequently linked to as a reference,
+  it only detects weather the polygon is self-intersecting or not.
 
 
 Goals
