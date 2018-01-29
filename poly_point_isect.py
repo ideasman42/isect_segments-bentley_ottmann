@@ -120,6 +120,8 @@ class Event:
             self.other = None
             self.in_sweep = False
 
+    # note that this isn't essential,
+    # it just avoids non-deterministic ordering, see #9.
     def __hash__(self):
         return hash(self.point)
 
