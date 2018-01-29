@@ -323,7 +323,7 @@ class SweepLine:
 
     def insert(self, event):
         assert(event not in self._events_current_sweep)
-        assert(event.type != Event.Type.START_VERTICAL)
+        assert(not USE_VERTICAL or event.type != Event.Type.START_VERTICAL)
         if USE_DEBUG:
             assert(event.in_sweep == False)
             assert(event.other.in_sweep == False)
