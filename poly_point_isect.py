@@ -13,7 +13,7 @@ __all__ = (
     # for testing only (correct but slow)
     "isect_segments__naive",
     "isect_polygon__naive",
-    )
+)
 
 # ----------------------------------------------------------------------------
 # Main Poly Intersection
@@ -92,11 +92,11 @@ class Event:
         # we may remove or calculate slope on the fly
         "slope",
         "span",
-        ) + (() if not USE_DEBUG else (
-         # debugging only
+    ) + (() if not USE_DEBUG else (
+        # debugging only
         "other",
         "in_sweep",
-        ))
+    ))
 
     class Type:
         END = 0
@@ -204,7 +204,7 @@ class Event:
             self.point,
             self.type,
             self.slope,
-            ))
+        ))
 
 
 class SweepLine:
@@ -226,7 +226,7 @@ class SweepLine:
         "_current_event_point_x",
         # A flag to indicate if we're slightly before or after the line.
         "_before",
-        )
+    )
 
     def __init__(self):
         self.intersections = {}
@@ -270,10 +270,11 @@ class SweepLine:
     def _check_intersection(self, a: Event, b: Event):
         # Return immediately in case either of the events is null, or
         # if one of them is an INTERSECTION event.
-        if ((a is None or b is None) or
+        if (
+                (a is None or b is None) or
                 (a.type == Event.Type.INTERSECTION) or
-                (b.type == Event.Type.INTERSECTION)):
-
+                (b.type == Event.Type.INTERSECTION)
+        ):
             return
 
         if a is b:
@@ -281,8 +282,9 @@ class SweepLine:
 
         # Get the intersection point between 'a' and 'b'.
         p = isect_seg_seg_v2_point(
-                a.segment[0], a.segment[1],
-                b.segment[0], b.segment[1])
+            a.segment[0], a.segment[1],
+            b.segment[0], b.segment[1],
+        )
 
         # No intersection exists.
         if p is None:
@@ -380,7 +382,7 @@ class SweepLine:
                 for i in range(0, len(events_current) - 1):
                     for j in range(i + 1, len(events_current)):
                         self._check_intersection(
-                                events_current[i], events_current[j])
+                            events_current[i], events_current[j])
 
         for e in events_current:
             self.handle_event(e)
@@ -441,7 +443,7 @@ class SweepLine:
                 if USE_PARANOID:
                     self._check_intersection(e_above, e_below)
         elif (USE_VERTICAL and
-                (t == Event.Type.START_VERTICAL)):
+              (t == Event.Type.START_VERTICAL)):
 
             # just check sanity
             assert(event.segment[0][X] == event.segment[1][X])
@@ -455,7 +457,7 @@ class SweepLine:
                 if e_above.type == Event.Type.START_VERTICAL:
                     continue
                 y_above = e_above.y_intercept_x(
-                        self._current_event_point_x)
+                    self._current_event_point_x)
                 if USE_IGNORE_SEGMENT_ENDINGS:
                     if y_above >= y_above_max - NUM_EPS:
                         break
@@ -479,7 +481,7 @@ class EventQueue:
         # The sorted map holding the points -> event list
         # [Point: Event] (tree)
         "events_scan",
-        )
+    )
 
     def __init__(self, segments, line: SweepLine):
         self.events_scan = RBTree()
@@ -517,8 +519,9 @@ class EventQueue:
         Offer a new event ``s`` at point ``p`` in this queue.
         """
         existing = self.events_scan.setdefault(
-                p, ([], [], [], []) if USE_VERTICAL else
-                   ([], [], []))
+            p, ([], [], [], []) if USE_VERTICAL else
+            ([], [], []),
+        )
         # Can use double linked-list for easy insertion at beginning/end
         '''
         if e.type == Event.Type.END:
