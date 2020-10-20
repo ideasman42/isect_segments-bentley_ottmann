@@ -780,7 +780,7 @@ _sentinel = object()
 
 
 class _ABCTree(object):
-    def __init__(self, items=None, cmp=None, cmp_data=None):
+    def __init__(self, cmp=None, cmp_data=None):
         """T.__init__(...) initializes T; see T.__class__.__doc__ for signature"""
         self._root = None
         self._count = 0
@@ -794,8 +794,6 @@ class _ABCTree(object):
                     return 0
         self._cmp = cmp
         self._cmp_data = cmp_data
-        if items is not None:
-            self.update(items)
 
     def clear(self):
         """T.clear() -> None.  Remove all items from T."""
