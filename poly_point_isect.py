@@ -821,7 +821,7 @@ class _ABCTree(object):
                 node = node.left
             else:
                 node = node.right
-        raise KeyError(str(key))
+        raise KeyError(key)
 
     def pop_item(self):
         """T.pop_item() -> (k, v), remove and return some (key, value) pair as a
