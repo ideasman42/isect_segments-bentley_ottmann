@@ -811,7 +811,7 @@ class _ABCTree(object):
         """Get items count."""
         return self._count
 
-    def get_value(self, key):
+    def _get_value_or_sentinel(self, key):
         node = self._root
         while node is not None:
             cmp = self._cmp(self._cmp_data, key, node.key)
@@ -821,7 +821,13 @@ class _ABCTree(object):
                 node = node.left
             else:
                 node = node.right
-        raise KeyError(str(key))
+        return _sentinel
+
+    def get_value(self, key):
+        value = self._get_value_or_sentinel(key)
+        if value is _sentinel:
+            raise KeyError(str(key))
+        return value
 
     def pop_item(self):
         """T.pop_item() -> (k, v), remove and return some (key, value) pair as a
@@ -949,11 +955,7 @@ class _ABCTree(object):
 
     def __contains__(self, key):
         """k in T -> True if T has a key k, else False"""
-        try:
-            self.get_value(key)
-            return True
-        except KeyError:
-            return False
+        self._get_value_or_sentinel(key) is not _sentinel
 
     def __len__(self):
         """T.__len__() <==> len(x)"""
@@ -965,19 +967,20 @@ class _ABCTree(object):
 
     def set_default(self, key, default=None):
         """T.set_default(k[,d]) -> T.get(k,d), also set T[k]=d if k not in T"""
-        try:
-            return self.get_value(key)
-        except KeyError:
+        value = self._get_value_or_sentinel(key)
+        if value is _sentinel:
             self.insert(key, default)
             return default
+        return value
     setdefault = set_default  # for compatibility to dict()
 
     def get(self, key, default=None):
         """T.get(k[,d]) -> T[k] if k in T, else d.  d defaults to None."""
-        try:
-            return self.get_value(key)
-        except KeyError:
+
+        value = self._get_value_or_sentinel(key)
+        if value is _sentinel:
             return default
+        return value
 
     def pop(self, key, *args):
         """T.pop(k[,d]) -> v, remove specified key and return the corresponding value.
@@ -985,15 +988,15 @@ class _ABCTree(object):
         """
         if len(args) > 1:
             raise TypeError("pop expected at most 2 arguments, got %d" % (1 + len(args)))
-        try:
-            value = self.get_value(key)
-            self.remove(key)
-            return value
-        except KeyError:
+
+        value = self._get_value_or_sentinel(key)
+        if value is _sentinel:
             if len(args) == 0:
-                raise
-            else:
-                return args[0]
+                raise KeyError(str(key))
+            return args[0]
+
+        self.remove(key)
+        return value
 
     def prev_key(self, key, default=_sentinel):
         """Get predecessor to key, raises KeyError if key is min key
