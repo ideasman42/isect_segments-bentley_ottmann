@@ -955,7 +955,7 @@ class _ABCTree(object):
 
     def __contains__(self, key):
         """k in T -> True if T has a key k, else False"""
-        self._get_value_or_sentinel(key) is not _sentinel
+        return self._get_value_or_sentinel(key) is not _sentinel
 
     def __len__(self):
         """T.__len__() <==> len(x)"""
