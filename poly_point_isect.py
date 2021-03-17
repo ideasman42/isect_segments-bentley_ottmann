@@ -2,6 +2,8 @@
 # BentleyOttmann sweep-line implementation
 # (for finding all intersections in a set of line segments)
 
+from __future__ import annotations
+
 __all__ = (
     "isect_segments",
     "isect_polygon",
@@ -228,8 +230,9 @@ class SweepLine:
         "_before",
     )
 
-    def __init__(self):
+    def __init__(self, queue: EventQueue):
         self.intersections = {}
+        self.queue = queue
 
         self._current_event_point_x = None
         self._events_current_sweep = RBTree(cmp=Event.Compare, cmp_data=self)
@@ -483,7 +486,7 @@ class EventQueue:
         "events_scan",
     )
 
-    def __init__(self, segments, line: SweepLine):
+    def __init__(self, segments):
         self.events_scan = RBTree()
         # segments = [s for s in segments if s[0][0] != s[1][0] and s[0][1] != s[1][1]]
 
@@ -511,8 +514,6 @@ class EventQueue:
 
                 self.offer(s[0], e_start)
                 self.offer(s[1], e_end)
-
-        line.queue = self
 
     def offer(self, p, e: Event):
         """
@@ -568,8 +569,8 @@ def isect_segments_impl(segments, include_segments=False) -> list:
             )
             for s in segments]
 
-    sweep_line = SweepLine()
-    queue = EventQueue(segments, sweep_line)
+    queue = EventQueue(segments)
+    sweep_line = SweepLine(queue)
 
     while len(queue.events_scan) > 0:
         if USE_VERBOSE:
