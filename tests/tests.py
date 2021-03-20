@@ -191,6 +191,10 @@ class IsectDegenerate(unittest.TestCase, TestDataFile_Helper):
     def test_zero_length_02(self):
         self.assertTestData("test_degenerate_zero_length_02")
 
+    # See bug #24.
+    def test_duplicates_01(self):
+        self.assertTestData("test_degenerate_duplicates_01")
+
 
 class IsectTest(unittest.TestCase, TestDataFile_Helper):
     """
@@ -244,4 +248,3 @@ if __name__ == '__main__':
         print("Untested modules:")
         for f in sorted(test_data_unused):
             print("   ", f)
-

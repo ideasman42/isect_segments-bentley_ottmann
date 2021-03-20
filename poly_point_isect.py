@@ -546,7 +546,7 @@ class EventQueue:
         return p, events_current
 
 
-def isect_segments_impl(segments, include_segments=False) -> list:
+def isect_segments_impl(segments, *, include_segments=False, validate=True) -> list:
     # order points left -> right
     if Real is float:
         segments = [
@@ -569,6 +569,22 @@ def isect_segments_impl(segments, include_segments=False) -> list:
             )
             for s in segments]
 
+    # Ensure segments don't have duplicates or single points, see: #24.
+    if validate:
+        segments_old = segments
+        segments = []
+        visited = set()
+        for s in segments_old:
+            # Ignore points.
+            if s[0] == s[1]:
+                continue
+            # Ignore duplicates.
+            if s in visited:
+                continue
+            visited.add(s)
+            segments.append(s)
+        del segments_old
+
     queue = EventQueue(segments)
     sweep_line = SweepLine(queue)
 
@@ -587,28 +603,29 @@ def isect_segments_impl(segments, include_segments=False) -> list:
         return sweep_line.get_intersections_with_segments()
 
 
-def isect_polygon_impl(points, include_segments=False) -> list:
+def isect_polygon_impl(points, *, include_segments=False, validate=True) -> list:
     n = len(points)
     segments = [
         (tuple(points[i]), tuple(points[(i + 1) % n]))
-        for i in range(n)]
-    return isect_segments_impl(segments, include_segments=include_segments)
+        for i in range(n)
+    ]
+    return isect_segments_impl(segments, include_segments=include_segments, validate=validate)
 
 
-def isect_segments(segments) -> list:
-    return isect_segments_impl(segments, include_segments=False)
+def isect_segments(segments, *, validate=True) -> list:
+    return isect_segments_impl(segments, include_segments=False, validate=validate)
 
 
-def isect_polygon(segments) -> list:
-    return isect_polygon_impl(segments, include_segments=False)
+def isect_polygon(segments, *, validate=True) -> list:
+    return isect_polygon_impl(segments, include_segments=False, validate=validate)
 
 
-def isect_segments_include_segments(segments) -> list:
-    return isect_segments_impl(segments, include_segments=True)
+def isect_segments_include_segments(segments, *, validate=True) -> list:
+    return isect_segments_impl(segments, include_segments=True, validate=validate)
 
 
-def isect_polygon_include_segments(segments) -> list:
-    return isect_polygon_impl(segments, include_segments=True)
+def isect_polygon_include_segments(segments, *, validate=True) -> list:
+    return isect_polygon_impl(segments, include_segments=True, validate=validate)
 
 
 # ----------------------------------------------------------------------------
