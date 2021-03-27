@@ -6,7 +6,7 @@ Poly Point Intersections
 This is a single-file, Python3 implementation of the Bentley-Ottmann sweep-line algorithm
 for listing all intersections in a set of line segments.
 
-This was initially based on the excellent `CompGeom <https://github.com/bkiers/CompGeom>`__ library,
+This was initially based the `CompGeom <https://github.com/bkiers/CompGeom>`__ library,
 but aims to be portable & self-contained, (move to other lower languages such as C & C++).
 
 .. figure:: https://cloud.githubusercontent.com/assets/1869379/10564349/753dd564-75fc-11e5-8e99-08530e6f6ef0.png
@@ -50,12 +50,14 @@ Usage
 
 ``poly_point_isect`` is a single Python module, exposing 2 functions.
 
-``isect_polygon(points)``
+``isect_polygon(points, validate=True)``
    Where ``points`` are a sequence of number pairs.
-``isect_segments(segments)``
+``isect_segments(segments, validate=True)``
    Where ``segments`` is list of point-pairs.
 
 Both return a list of intersections.
+
+The ``validate`` argument ensures duplicate or zero length segments are ignored.
 
 Example:
 
@@ -68,7 +70,7 @@ Example:
        (0.0, 1.0),
        (0.0, 0.0),
        (1.0, 1.0),
-       )
+   )
    isect = poly_point_isect.isect_polygon(poly)
    print(isect)
    # [(0.5, 0.5)]
@@ -136,4 +138,3 @@ Further Work
 
 - More tests.
 - More test variations *(different scales, rotations)*.
-
