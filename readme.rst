@@ -10,7 +10,7 @@ This aims to be portable & self-contained, (move to other lower languages such a
 
 .. figure:: https://cloud.githubusercontent.com/assets/1869379/10564349/753dd564-75fc-11e5-8e99-08530e6f6ef0.png
 
-   Test-case with showing all 73002 intersections from 14880 segments.
+   Test-case with showing all 73,002 intersections from 14,880 segments.
 
 
 Motivation
