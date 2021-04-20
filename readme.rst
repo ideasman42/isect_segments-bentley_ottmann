@@ -6,12 +6,11 @@ Poly Point Intersections
 This is a single-file, Python3 implementation of the Bentley-Ottmann sweep-line algorithm
 for listing all intersections in a set of line segments.
 
-This was initially based the `CompGeom <https://github.com/bkiers/CompGeom>`__ library,
-but aims to be portable & self-contained, (move to other lower languages such as C & C++).
+This aims to be portable & self-contained, (move to other lower languages such as C & C++).
 
 .. figure:: https://cloud.githubusercontent.com/assets/1869379/10564349/753dd564-75fc-11e5-8e99-08530e6f6ef0.png
 
-   Testcase with showing all 73002 intersections from 14880 segments.
+   Test-case with showing all 73002 intersections from 14880 segments.
 
 
 Motivation
