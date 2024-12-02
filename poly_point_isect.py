@@ -1060,7 +1060,8 @@ class _ABCTree(object):
 
         Yields keys in ascending order if reverse is False else in descending order.
         """
-        return (k for k, v in self.iter_items(start_key, end_key, reverse=reverse))
+        # NOTE: would use `iter_keys` if it were supported.
+        return (k for k, _v in self.iter_items(start_key, end_key, reverse=reverse))
 
     def iter_items(self,  start_key=None, end_key=None, reverse=False):
         """Iterates over the (key, value) items of the associated tree,
