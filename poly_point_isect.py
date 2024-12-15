@@ -108,7 +108,7 @@ class Event:
             START_VERTICAL = 3
 
     def __init__(self, type, point, segment, slope):
-        assert(isinstance(point, tuple))
+        assert isinstance(point, tuple)
         self.type = type
         self.point = point
         self.segment = segment
@@ -152,7 +152,7 @@ class Event:
         else:
             fac = delta_x1 / self.span
             ifac = NUM_ONE - fac
-        assert(fac <= NUM_ONE)
+        assert fac <= NUM_ONE
         return (self.segment[0][Y] * fac) + (self.segment[1][Y] * ifac)
 
     @staticmethod
@@ -174,7 +174,7 @@ class Event:
 
         delta_y = this_y - that_y
 
-        assert((delta_y < NUM_ZERO) == (this_y < that_y))
+        assert (delta_y < NUM_ZERO) == (this_y < that_y)
         # NOTE, VERY IMPORTANT TO USE EPSILON HERE!
         # otherwise w/ float precision errors we get incorrect comparisons
         # can get very strange & hard to debug output without this.
@@ -327,11 +327,11 @@ class SweepLine:
         self._current_event_point_x = p[X]
 
     def insert(self, event):
-        assert(event not in self._events_current_sweep)
-        assert(not USE_VERTICAL or event.type != Event.Type.START_VERTICAL)
+        assert event not in self._events_current_sweep
+        assert not USE_VERTICAL or event.type != Event.Type.START_VERTICAL
         if USE_DEBUG:
-            assert(event.in_sweep == False)
-            assert(event.other.in_sweep == False)
+            assert event.in_sweep == False
+            assert event.other.in_sweep == False
 
         self._events_current_sweep.insert(event, None)
 
@@ -343,15 +343,15 @@ class SweepLine:
         try:
             self._events_current_sweep.remove(event)
             if USE_DEBUG:
-                assert(event.in_sweep == True)
-                assert(event.other.in_sweep == True)
+                assert event.in_sweep
+                assert event.other.in_sweep
                 event.in_sweep = False
                 event.other.in_sweep = False
             return True
         except KeyError:
             if USE_DEBUG:
-                assert(event.in_sweep == False)
-                assert(event.other.in_sweep == False)
+                assert event.in_sweep is False
+                assert event.other.in_sweep is False
             return False
 
     def above(self, event):
@@ -378,7 +378,7 @@ class SweepLine:
             return
         # done already
         # self._sweep_to(events_current[0])
-        assert(p[0] == self._current_event_point_x)
+        assert p[0] == self._current_event_point_x
 
         if not USE_IGNORE_SEGMENT_ENDINGS:
             if len(events_current) > 1:
@@ -449,8 +449,8 @@ class SweepLine:
               (t == Event.Type.START_VERTICAL)):
 
             # just check sanity
-            assert(event.segment[0][X] == event.segment[1][X])
-            assert(event.segment[0][Y] <= event.segment[1][Y])
+            assert event.segment[0][X] == event.segment[1][X]
+            assert event.segment[0][Y] <= event.segment[1][Y]
 
             # In this case we only need to find all segments in this span.
             y_above_max = event.segment[1][Y]
@@ -491,7 +491,7 @@ class EventQueue:
         # segments = [s for s in segments if s[0][0] != s[1][0] and s[0][1] != s[1][1]]
 
         for s in segments:
-            assert(s[0][X] <= s[1][X])
+            assert s[0][X] <= s[1][X]
 
             slope = slope_v2v2(*s)
 
@@ -506,7 +506,7 @@ class EventQueue:
                 self.offer(s[0], e_start)
             else:
                 e_start = Event(Event.Type.START, s[0], s, slope)
-                e_end   = Event(Event.Type.END,   s[1], s, slope)
+                e_end = Event(Event.Type.END, s[1], s, slope)
 
                 if USE_DEBUG:
                     e_start.other = e_end
@@ -541,7 +541,7 @@ class EventQueue:
         :return: the first (lowest) item from this queue.
         :rtype: Point, Event pair.
         """
-        assert(len(self.events_scan) != 0)
+        assert len(self.events_scan) != 0
         p, events_current = self.events_scan.pop_min()
         return p, events_current
 
@@ -755,7 +755,6 @@ def isect_polygon__naive(points) -> list:
         pass
     else:
         points = [(Real(p[0]), Real(p[1])) for p in points]
-
 
     for i in range(n):
         a0, a1 = points[i], points[(i + 1) % n]
@@ -1063,7 +1062,7 @@ class _ABCTree(object):
         # NOTE: would use `iter_keys` if it were supported.
         return (k for k, _v in self.iter_items(start_key, end_key, reverse=reverse))
 
-    def iter_items(self,  start_key=None, end_key=None, reverse=False):
+    def iter_items(self, start_key=None, end_key=None, reverse=False):
         """Iterates over the (key, value) items of the associated tree,
         in ascending order if reverse is True, iterate in descending order,
         reverse defaults to False"""
@@ -1283,7 +1282,7 @@ class RBTree(_ABCTree):
                             direction2 = 1 if grand_parent.right is parent else 0
                             if RBTree.is_red(sibling[last]):
                                 grand_parent[direction2] = RBTree.jsw_double(parent, last)
-                            elif RBTree.is_red(sibling[1-last]):
+                            elif RBTree.is_red(sibling[1 - last]):
                                 grand_parent[direction2] = RBTree.jsw_single(parent, last)
                             # Ensure correct coloring
                             grand_parent[direction2].red = True
